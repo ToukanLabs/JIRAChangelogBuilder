@@ -15,27 +15,20 @@ public class Changelog {
   public static String FIX_VERSION_RESTICT_MODE_LESS_THAN_OR_EQUAL = "LTE";
   
   /* CBF Enums... */
-  public static String REQUEST_TOKEN_COMMAND = "REQUEST_TOKEN";
-  public static String ACCESS_TOKEN_COMMAND = "ACCESS_TOKEN";
+  public static final String REQUEST_TOKEN_COMMAND = "REQUEST_TOKEN";
+  public static final String ACCESS_TOKEN_COMMAND = "ACCESS_TOKEN";
   
   public static final String CONSUMER_KEY = "JIRAChangelogBuilderFivium";
 
   /**
    * Show usage of the application.
    */
-// TODO: update the usage and error messages for OAuth
   public static void showUsage() {
-	System.out.println("\nFirst time set-up:");
-	System.out.println("Step 1. Ask JIRA administrator to add Application Link Integration with consumer key \"" + CONSUMER_KEY +"\". Details in README.md.");
-	System.out.println("Step 2. java -jar jira-changelog-builder.jar \"REQUEST_TOKEN\" <JIRA_URL> <OAUTH_PRIVATE_KEY>");
-	System.out.println("Step 3. Note REQUEST_TOKEN and TOKEN_SECRET from Step 1 output. Ask JIRA administrator to authorise consumer via URL from Step 1 output to obtain VERIFIER.");
-	System.out.println("Step 4. java -jar jira-changelog-builder.jar \"ACCESS_TOKEN\" <JIRA_URL> <OAUTH_PRIVATE_KEY> <REQUEST_TOKEN> <TOKEN_SECRET> <VERIFIER>");
-	System.out.println("Step 5. Store Access Token from Step 3, which is valid until revoked via JIRA.");
     System.out.println("\nUsage:");
-    System.out.println("java -jar jira-changelog-builder.jar <JIRA_URL> <OAUTH_PRIVATE_KEY> <OAUTH_ACCESS_TOKEN> <JIRA_project_key> <version> <template_list> [<flags>]");
+    System.out.println("java -jar jira-changelog-builder.jar <JIRA_URL> <OAuth_private_key> <OAuth_access_token> <JIRA_project_key> <version> <template_list> [<flags>]");
     System.out.println("<JIRA_URL>: The URL of the JIRA instance (e.g. https://somecompany.atlassian.net).");
-    System.out.println("<OAUTH_PRIVATE_KEY>: RSA private key matching the public key entered into Application Link's Incoming Authentication on JIRA, used for OAuth.");
-    System.out.println("<OAUTH_ACCESS_TOKEN>: Token given by JIRA after successful OAuth authorisation by JIRA administrator.");
+    System.out.println("<OAuth_private_key>: RSA private key matching the public key entered into Application Link's Incoming Authentication on JIRA, used for OAuth.");
+    System.out.println("<OAuth_access_token>: Access token provided by JIRA after successful OAuth authorisation by JIRA administrator.");
     System.out.println("<JIRA_project_key>: The key of the project in JIRA.");
     System.out.println("<version>: Specifies up to which version the changelog should be generated.");
     System.out.println("<template_root>: The path on disk to the directory that contains the template files.");
@@ -77,7 +70,7 @@ public class Changelog {
         String authorizeUrl = jiraOAuthClient.getAuthorizeUrlForToken(requestToken.token);
         System.out.println("REQUEST_TOKEN is " + requestToken.token);
         System.out.println("TOKEN_SECRET is " + requestToken.secret);
-        System.out.println("Ask your JIRA administrator to visit\n\n" + authorizeUrl + "\n\nand authorise access to obtain VERIFIER, link expires after short timeout. This usually needs to be performed only once.");
+        System.out.println("Go to and 'Allow' to obtain VERIFIER:\n\n" + authorizeUrl);
         System.exit(0);
     }
     if (args.length == 6 && args[0].equals("ACCESS_TOKEN")) {
@@ -101,10 +94,6 @@ public class Changelog {
     final String jiraURL = args[currentArgument++];
 	final String oAuthPrivateKey = args[currentArgument++]; //TODO: Read private key from file?
 	final String oAuthAccessToken = args[currentArgument++];
-	
-	System.out.println(oAuthPrivateKey);
-	System.out.println(oAuthAccessToken);
-	
     final String jiraProjectKey = args[currentArgument++];
     final String versionName = args[currentArgument++];
     final String templateRoot = args[currentArgument++];
@@ -187,8 +176,6 @@ public class Changelog {
             + "\n  Version: " + versionName
             + "\n  JIRA Project Key: " + jiraProjectKey
             + "\n  JIRA URL: " + jiraURL
-//            + "\n  JIRA username: " + jiraUsername
-//            + "\n  JIRA password: " + jiraPassword.substring(0, 1) + "*****" + jiraPassword.substring(jiraPassword.length() - 1)
             + "\n  Template files: " + templateList);
 
     File f;

@@ -125,8 +125,8 @@ public class ChangelogTemplateTest extends TestCase {
     System.out.println("fullRun");
     String[] args = new String[12];
     args[0] = properties.getProperty("url");
-    args[1] = properties.getProperty("username");
-    args[2] = properties.getProperty("password");
+    args[1] = properties.getProperty("oauthprivatekey");
+    args[2] = properties.getProperty("oauthaccesstoken");
     args[3] = properties.getProperty("project");
     args[4] = properties.getProperty("version");
     args[5] = "examples";
@@ -182,8 +182,8 @@ public class ChangelogTemplateTest extends TestCase {
     
     String[] args = new String[14];
     args[0] = properties.getProperty("url");
-    args[1] = properties.getProperty("username");
-    args[2] = properties.getProperty("password");
+    args[1] = properties.getProperty("oauthprivatekey");
+    args[2] = properties.getProperty("oauthaccesstoken");
     args[3] = properties.getProperty("project");
     args[4] = properties.getProperty("version");
     args[5] = "examples";
@@ -220,8 +220,8 @@ public class ChangelogTemplateTest extends TestCase {
     
     String[] args = new String[14];
     args[0] = properties.getProperty("url");
-    args[1] = properties.getProperty("username");
-    args[2] = properties.getProperty("password");
+    args[1] = properties.getProperty("oauthprivatekey");
+    args[2] = properties.getProperty("oauthaccesstoken");
     args[3] = properties.getProperty("project");
     args[4] = properties.getProperty("version");
     args[5] = "examples";

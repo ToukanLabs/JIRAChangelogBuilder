@@ -13,13 +13,13 @@ Usage
 
 From the command line:
 
-    java -jar jira-changelog-builder.jar <JIRA_URL> <JIRA_username> <JIRA_password> <JIRA_project_key> <version> <template_list> [<flags>]
+    java -jar jira-changelog-builder.jar <JIRA_URL> <OAuth_private_key> <OAuth_access_token> <JIRA_project_key> <version> <template_list> [<flags>]
   
 Where the arguments are used as follows:
   
   *  `<JIRA_URL>`: The URL of the JIRA instance (e.g. https://somecompany.atlassian.net).
-  *  `<JIRA_username>`: The username used to log into JIRA.
-  *  `<JIRA_password>`: The password used to log into JIRA.
+  *  `<OAuth_private_key>`: RSA private key matching the public key entered into Application Link's Incoming Authentication on JIRA, used for OAuth.
+  *  `<OAuth_access_token>`: Access token obtained from JIRA after successful OAuth authorisation by JIRA administrator.
   *  `<JIRA_project_key>`: The key of the project in JIRA.
   *  `<version>`: Specifies up to which version the changelog should be generated.
   *  `<template_root>`: The path on disk to the directory containing the mustache template files. All files in `<template_list>` are relative to this path.
@@ -45,11 +45,13 @@ Testing
 In order to execute the unit tests properly (and build/install the program), you must create a file named testing.properties and place it in the base directory. In this file, add the following values:
   
   * `url = <URL>` where `<URL>` is the web address of the JIRA instance.
-  * `username = <username>` where `<username>` is the username of a user that can access the JIRA instance.
-  * `password = <password>` where `<password>` is the password for the specified user.
+  * `oauthprivatekey = <OAuth_private_key>` where `<OAuth_private_key>` is the 
+  * `oauthaccesstoken = <OAuth_access_token>` where `<OAuth_access_token>` is the OAuth access token.
   * `project = <project>` where `<project>` is the identifier (key) of the JIRA project.
   * `version = <version>` where `<version>` is the version up to which the changelog should be generated.
   * `versionstartswith = <starts_with>` where `<starts_with>` is a substring (prefix) of a version for which the write will match on to decide which version to include. For example, if `<starts_with>` is "ACME_1.3" then "ACME_1.3.1", "ACME_1.3.5" and "ACME_1.3.8" would all match whilst "ACME_1.1.8" and "ACME_1.4.9" would not.
   * `versionlessthanorequal = <less_than_or_equal>` where `<less_than_or_equal>` is a version name that you want to compare as a string and only include versions with a name less than or equal to this. For example if `<less_than_or_equal>` is "ACME_1.3.8" then "ACME_1.3.1", "ACME_1.3.5" and "ACME_1.1.8" would all match whilst "ACME_1.3.9" and "ACME_1.4.9" would not.
+  
+You must also create an Application Link in JIRA and obtain an access token from JIRA.
 
 Tests can be manually executed by running 'mvn test' from the base directory.
