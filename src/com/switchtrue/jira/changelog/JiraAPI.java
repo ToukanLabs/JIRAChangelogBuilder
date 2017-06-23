@@ -27,10 +27,9 @@ import com.atlassian.util.concurrent.Promise;
  * @author mleonard87
  *
  */
-public class JiraAPI {
+public abstract class JiraAPI {
 
-  private final String username_, password_;
-  private final URI jiraServerURI_;
+  protected final URI jiraServerURI_;
   private String jql_;
   private String descriptionField_;
   private LinkedList<VersionInfo> versionList_;
@@ -49,10 +48,7 @@ public class JiraAPI {
    * @param descriptionField The name of the field in JIRA to use as the
    * changelog description.
    */
-  public JiraAPI(String username, String password, String URL, String jql, String descriptionField, String fixVersionRestrictMode, String fixVersionRestrictTerm) {
-    username_ = username;
-    password_ = password;
-
+  public JiraAPI(String URL, String jql, String descriptionField, String fixVersionRestrictMode, String fixVersionRestrictTerm) {
     if (jql.equals("")) {
       jql_ = "";
     } else {
@@ -72,7 +68,7 @@ public class JiraAPI {
       jiraServerURI_ = tempURI;
     }
   }
-
+    
   /**
    * Sets the version info cache
    *
@@ -119,6 +115,8 @@ public class JiraAPI {
     return false;
   }
   
+  public abstract JiraRestClient getRestClient();
+  
   /**
    * Communicate with JIRA to find all versions prior to the version you are
    * currently building for each version found get a list of issues fixed in
@@ -135,7 +133,7 @@ public class JiraAPI {
       // Create the initial JIRA connection.
       Logger.log("Establishing JIRA API connection for generating changelog to " + jiraServerURI_ + ".");
       JiraRestClientFactory factory = new AsynchronousJiraRestClientFactory();
-      final JiraRestClient restClient = factory.createWithBasicHttpAuthentication(jiraServerURI_, username_, password_);
+      final JiraRestClient restClient = getRestClient();
 
       // Get an instance of the JIRA Project
       Logger.log("Obtaining project information via JIRA API.");
