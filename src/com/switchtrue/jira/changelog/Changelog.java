@@ -172,6 +172,8 @@ public class Changelog {
             + "\n  Version: " + versionName
             + "\n  JIRA Project Key: " + jiraProjectKey
             + "\n  JIRA URL: " + jiraURL
+            + "\n  OAuth private key: " + oAuthPrivateKey.substring(0, 1) + "***" + oAuthPrivateKey.substring(oAuthPrivateKey.length() - 1)
+            + "\n  OAuth access token: " + oAuthAccessToken.substring(0, 1) + "***" + oAuthAccessToken.substring(oAuthAccessToken.length() - 1)
             + "\n  Template files: " + templateList);
 
     File f;
@@ -206,11 +208,5 @@ public class Changelog {
     Logger.log("Done - Success!");
     
     System.exit(0);
-  }
-  
-  /** Maven tests fail if you have System.exit(0) in main(): "test failed: The forked VM terminated without saying properly goodbye. VM crash or System.exit called ?" */
-  public static void mainWrapper(String[] args) {
-	  
-	  
   }
 }
