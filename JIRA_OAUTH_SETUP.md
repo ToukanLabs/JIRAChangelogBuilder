@@ -27,7 +27,7 @@ Configuring OAuth
     * **Save**
     
 ### Request token
-* Run `java -jar jira-changelog-builder.jar "REQUEST_TOKEN" "<JIRA_URL>" "<OAUTH_PRIVATE_KEY>"`, where `<JIRA_URL>` is your JIRA base URL and `<OAUTH_PRIVATE_KEY>` is your private key text (e.g. the text in `rsa-key_pcks8` from Pre-requisites. TODO: Read from file if needed).
+* Run `java -jar jira-changelog-builder.jar -r <JIRA_URL> <OAUTH_PRIVATE_KEY>`, where `<JIRA_URL>` is your JIRA base URL and `<OAUTH_PRIVATE_KEY>` is your private key text (e.g. the text in `rsa-key_pcks8` from Pre-requisites. TODO: Read from file if needed).
 
 **Example output**
 ```
@@ -61,7 +61,7 @@ You have successfully authorized 'JIRAChangelogBuilderFivium'. Your verification
 
 ### Get access token
 
-* Run `java -jar jira-changelog-builder.jar "ACCESS_TOKEN" "<JIRA_URL>" "<OAUTH_PRIVATE_KEY>" "<REQUEST_TOKEN>" "<TOKEN_SECRET>" "<VERIFIER>"` where `<REQUEST_TOKEN>`, `<TOKEN_SECRET>`, `<VERIFIER>` are values obtained from previous steps.
+* Run `java -jar jira-changelog-builder.jar -a <JIRA_URL> <OAUTH_PRIVATE_KEY> <REQUEST_TOKEN> <TOKEN_SECRET> <VERIFIER>` where `<REQUEST_TOKEN>`, `<TOKEN_SECRET>`, `<VERIFIER>` are values obtained from previous steps.
 
 **Example output**
 ```
@@ -69,4 +69,5 @@ ACCESS_TOKEN is 35FcJ5Jil60NR9srtI6pdZz3MiYHz1qR
 ```
 
 * Store the ACCESS_TOKEN for later use.
-
+* No further JIRA configuration necessary.
+* Use the same private key and access token, from steps above, when running `jira-changelogbuilder.jar`. 

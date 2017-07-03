@@ -14,10 +14,6 @@ public class Changelog {
   public static String FIX_VERSION_RESTICT_MODE_STARTS_WITH        = "SW";
   public static String FIX_VERSION_RESTICT_MODE_LESS_THAN_OR_EQUAL = "LTE";
   
-  /* CBF Enums... */
-  public static final String REQUEST_TOKEN_COMMAND = "REQUEST_TOKEN";
-  public static final String ACCESS_TOKEN_COMMAND = "ACCESS_TOKEN";
-  
   public static final String CONSUMER_KEY = "JIRAChangelogBuilderFivium";
 
   /**
@@ -51,39 +47,39 @@ public class Changelog {
    * @param args Arguments passed in from the command line
    */
   public static void main(String[] args) {
-	int currentArgument = 0;
+    int currentArgument = 0;
     if (args.length == 1) {
-    	if (args[0].equals("--help")) {
-    		showUsage();
-		    System.exit(0);
-    	} else if (args[0].equals("--print-consumer-key")) {
-			System.out.println(CONSUMER_KEY);
-			System.exit(0);
-		}
-    } 
-    if (args.length == 3 && args[0].equals("REQUEST_TOKEN")){
-    	currentArgument++;
-    	final String jiraUrl = args[currentArgument++];
-    	final String oAuthPrivateKey = args[currentArgument++];
-    	AtlassianOAuthClient jiraOAuthClient = new AtlassianOAuthClient(CONSUMER_KEY, oAuthPrivateKey, jiraUrl, "oob");
-		TokenSecretVerifierHolder requestToken = jiraOAuthClient.getRequestToken();
-        String authorizeUrl = jiraOAuthClient.getAuthorizeUrlForToken(requestToken.token);
-        System.out.println("REQUEST_TOKEN is " + requestToken.token);
-        System.out.println("TOKEN_SECRET is " + requestToken.secret);
-        System.out.println("Go to and 'Allow' to obtain VERIFIER:\n\n" + authorizeUrl);
+      if (args[0].equals("--help")) {
+        showUsage();
         System.exit(0);
+      } else if (args[0].equals("--print-consumer-key")) {
+      System.out.println("Consumer key is: " + CONSUMER_KEY);
+      System.exit(0);
+      }
     }
-    if (args.length == 6 && args[0].equals("ACCESS_TOKEN")) {
-    	currentArgument++;
-    	final String jiraUrl = args[currentArgument++];
-    	final String oAuthPrivateKey = args[currentArgument++];
-    	final String requestToken = args[currentArgument++];
-    	final String tokenSecret = args[currentArgument++];
-    	final String oAuthVerifer = args[currentArgument++];
-    	AtlassianOAuthClient jiraOAuthClient = new AtlassianOAuthClient(CONSUMER_KEY, oAuthPrivateKey, jiraUrl, null);
-    	final String accessToken = jiraOAuthClient.swapRequestTokenForAccessToken(requestToken, tokenSecret, oAuthVerifer);
-    	System.out.println("ACCESS_TOKEN is " + accessToken);
-    	System.exit(0);
+    if (args.length == 3 && args[0].equals("-r")){
+      currentArgument++;
+      final String jiraUrl = args[currentArgument++];
+      final String oAuthPrivateKey = args[currentArgument++];
+      AtlassianOAuthClient jiraOAuthClient = new AtlassianOAuthClient(CONSUMER_KEY, oAuthPrivateKey, jiraUrl, "oob");
+      TokenSecretVerifierHolder requestToken = jiraOAuthClient.getRequestToken();
+      String authorizeUrl = jiraOAuthClient.getAuthorizeUrlForToken(requestToken.token);
+      System.out.println("REQUEST_TOKEN is " + requestToken.token);
+      System.out.println("TOKEN_SECRET is " + requestToken.secret);
+      System.out.println("Go to and 'Allow' to obtain VERIFIER:\n\n" + authorizeUrl);
+      System.exit(0);
+    }
+    if (args.length == 6 && args[0].equals("-a")) {
+      currentArgument++;
+      final String jiraUrl = args[currentArgument++];
+      final String oAuthPrivateKey = args[currentArgument++];
+      final String requestToken = args[currentArgument++];
+      final String tokenSecret = args[currentArgument++];
+      final String oAuthVerifer = args[currentArgument++];
+      AtlassianOAuthClient jiraOAuthClient = new AtlassianOAuthClient(CONSUMER_KEY, oAuthPrivateKey, jiraUrl, null);
+      String accessToken = jiraOAuthClient.swapRequestTokenForAccessToken(requestToken, tokenSecret, oAuthVerifer);
+      System.out.println("ACCESS_TOKEN is " + accessToken);
+      System.exit(0);
     }
     if (args.length < 6) {
       System.out.println("Not enough arguments given.");
@@ -92,8 +88,8 @@ public class Changelog {
     }
 
     final String jiraURL = args[currentArgument++];
-	final String oAuthPrivateKey = args[currentArgument++]; //TODO: Read private key from file?
-	final String oAuthAccessToken = args[currentArgument++];
+    final String oAuthPrivateKey = args[currentArgument++]; //TODO: Read private key from file?
+    final String oAuthAccessToken = args[currentArgument++];
     final String jiraProjectKey = args[currentArgument++];
     final String versionName = args[currentArgument++];
     final String templateRoot = args[currentArgument++];
@@ -186,8 +182,7 @@ public class Changelog {
         System.exit(2);
       }
     }
-
-//  JiraAPI jiraApi = new JiraAPIBasicAuth(jiraUsername, jiraPassword, jiraURL, jql, descriptionField, fixVersionRestrictMode, fixVersionRestrictTerm);    
+    
     JiraAPI jiraApi = new JiraAPIOAuth(CONSUMER_KEY, oAuthPrivateKey, oAuthAccessToken, null, jiraURL, jql, descriptionField, fixVersionRestrictMode, fixVersionRestrictTerm);
 
     if (objectCachePath != null) {

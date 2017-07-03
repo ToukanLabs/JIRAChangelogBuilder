@@ -5,7 +5,7 @@ package com.atlassian.oauth.client.example;
  */
 public class TokenSecretVerifierHolder
 {
-    public String token;
-    public String verifier;
-    public String secret;
+  public String token;
+  public String verifier;
+  public String secret;
 }

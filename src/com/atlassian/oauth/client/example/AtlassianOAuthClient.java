@@ -21,114 +21,114 @@ import static net.oauth.OAuth.OAUTH_VERIFIER;
  */
 public class AtlassianOAuthClient
 {
-    protected static final String SERVLET_BASE_URL = "/plugins/servlet";
+  protected static final String SERVLET_BASE_URL = "/plugins/servlet";
 
-    private final String consumerKey;
-    private final String privateKey;
-    private final String baseUrl;
-    private final String callback;
-    private OAuthAccessor accessor;
+  private final String consumerKey;
+  private final String privateKey;
+  private final String baseUrl;
+  private final String callback;
+  private OAuthAccessor accessor;
 
 
-    public AtlassianOAuthClient(String consumerKey, String privateKey, String baseUrl, String callback)
+  public AtlassianOAuthClient(String consumerKey, String privateKey, String baseUrl, String callback)
+  {
+    this.consumerKey = consumerKey;
+    this.privateKey = privateKey;
+    this.baseUrl = baseUrl;
+    this.callback = callback;
+  }
+
+  public TokenSecretVerifierHolder getRequestToken()
+  {
+    try
     {
-        this.consumerKey = consumerKey;
-        this.privateKey = privateKey;
-        this.baseUrl = baseUrl;
-        this.callback = callback;
-    }
+      OAuthAccessor accessor = getAccessor();
+      OAuthClient oAuthClient = new OAuthClient(new HttpClient4());
+      List<OAuth.Parameter> callBack;
+      if (callback == null || "".equals(callback))
+      {
+        callBack = Collections.<OAuth.Parameter>emptyList();
+      }
+      else
+      {
+        callBack = ImmutableList.of(new OAuth.Parameter(OAuth.OAUTH_CALLBACK, callback));
+      }
 
-    public TokenSecretVerifierHolder getRequestToken()
+      OAuthMessage message = oAuthClient.getRequestTokenResponse(accessor, "POST", callBack);
+      TokenSecretVerifierHolder tokenSecretVerifier = new TokenSecretVerifierHolder();
+      tokenSecretVerifier.token = accessor.requestToken;
+      tokenSecretVerifier.secret = accessor.tokenSecret;
+      tokenSecretVerifier.verifier = message.getParameter(OAUTH_VERIFIER);
+      return tokenSecretVerifier;
+    }
+    catch (Exception e)
     {
-        try
-        {
-            OAuthAccessor accessor = getAccessor();
-            OAuthClient oAuthClient = new OAuthClient(new HttpClient4());
-            List<OAuth.Parameter> callBack;
-            if (callback == null || "".equals(callback))
-            {
-                callBack = Collections.<OAuth.Parameter>emptyList();
-            }
-            else
-            {
-                callBack = ImmutableList.of(new OAuth.Parameter(OAuth.OAUTH_CALLBACK, callback));
-            }
-
-            OAuthMessage message = oAuthClient.getRequestTokenResponse(accessor, "POST", callBack);
-            TokenSecretVerifierHolder tokenSecretVerifier = new TokenSecretVerifierHolder();
-            tokenSecretVerifier.token = accessor.requestToken;
-            tokenSecretVerifier.secret = accessor.tokenSecret;
-            tokenSecretVerifier.verifier = message.getParameter(OAUTH_VERIFIER);
-            return tokenSecretVerifier;
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException("Failed to obtain request token", e);
-        }
+      throw new RuntimeException("Failed to obtain request token", e);
     }
+  }
 
-    public String swapRequestTokenForAccessToken(String requestToken, String tokenSecret, String oauthVerifier)
+  public String swapRequestTokenForAccessToken(String requestToken, String tokenSecret, String oauthVerifier)
+  {
+    try
     {
-        try
-        {
-            OAuthAccessor accessor = getAccessor();
-            OAuthClient client = new OAuthClient(new HttpClient4());
-            accessor.requestToken = requestToken;
-            accessor.tokenSecret = tokenSecret;
-            OAuthMessage message = client.getAccessToken(accessor, "POST",
-                    ImmutableList.of(new OAuth.Parameter(OAuth.OAUTH_VERIFIER, oauthVerifier)));
-            return message.getToken();
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException("Failed to swap request token with access token", e);
-        }
+      OAuthAccessor accessor = getAccessor();
+      OAuthClient client = new OAuthClient(new HttpClient4());
+      accessor.requestToken = requestToken;
+      accessor.tokenSecret = tokenSecret;
+      OAuthMessage message = client.getAccessToken(accessor, "POST",
+          ImmutableList.of(new OAuth.Parameter(OAuth.OAUTH_VERIFIER, oauthVerifier)));
+      return message.getToken();
     }
-
-    @Deprecated
-    public String makeAuthenticatedRequest(String url, String accessToken)
+    catch (Exception e)
     {
-        try
-        {
-            OAuthAccessor accessor = getAccessor();
-            OAuthClient client = new OAuthClient(new HttpClient4());
-            accessor.accessToken = accessToken;
-            OAuthMessage response = client.invoke(accessor, url, Collections.<Map.Entry<?, ?>>emptySet());
-            return response.readBodyAsString();
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException("Failed to make an authenticated request.", e);
-        }
+      throw new RuntimeException("Failed to swap request token with access token", e);
     }
+  }
 
-    public final OAuthAccessor getAccessor()
+  @Deprecated
+  public String makeAuthenticatedRequest(String url, String accessToken)
+  {
+    try
     {
-        if (accessor == null)
-        {
-            OAuthServiceProvider serviceProvider = new OAuthServiceProvider(getRequestTokenUrl(), getAuthorizeUrl(), getAccessTokenUrl());
-            OAuthConsumer consumer = new OAuthConsumer(callback, consumerKey, null, serviceProvider);
-            consumer.setProperty(RSA_SHA1.PRIVATE_KEY, privateKey);
-            consumer.setProperty(OAuth.OAUTH_SIGNATURE_METHOD, OAuth.RSA_SHA1);
-            accessor = new OAuthAccessor(consumer);
-        }
-        return accessor;
+      OAuthAccessor accessor = getAccessor();
+      OAuthClient client = new OAuthClient(new HttpClient4());
+      accessor.accessToken = accessToken;
+      OAuthMessage response = client.invoke(accessor, url, Collections.<Map.Entry<?, ?>>emptySet());
+      return response.readBodyAsString();
     }
-
-    private String getAccessTokenUrl()
+    catch (Exception e)
     {
-        return baseUrl + SERVLET_BASE_URL + "/oauth/access-token";
+      throw new RuntimeException("Failed to make an authenticated request.", e);
     }
+  }
 
-    private String getRequestTokenUrl()
+  public final OAuthAccessor getAccessor()
+  {
+    if (accessor == null)
     {
-        return  baseUrl + SERVLET_BASE_URL + "/oauth/request-token";
+      OAuthServiceProvider serviceProvider = new OAuthServiceProvider(getRequestTokenUrl(), getAuthorizeUrl(), getAccessTokenUrl());
+      OAuthConsumer consumer = new OAuthConsumer(callback, consumerKey, null, serviceProvider);
+      consumer.setProperty(RSA_SHA1.PRIVATE_KEY, privateKey);
+      consumer.setProperty(OAuth.OAUTH_SIGNATURE_METHOD, OAuth.RSA_SHA1);
+      accessor = new OAuthAccessor(consumer);
     }
+    return accessor;
+  }
 
-    public String getAuthorizeUrlForToken(String token)
-    {
-        return getAuthorizeUrl() + "?oauth_token=" + token;
-    }
+  private String getAccessTokenUrl()
+  {
+    return baseUrl + SERVLET_BASE_URL + "/oauth/access-token";
+  }
 
-    private String getAuthorizeUrl() {return baseUrl + SERVLET_BASE_URL + "/oauth/authorize";}
+  private String getRequestTokenUrl()
+  {
+    return  baseUrl + SERVLET_BASE_URL + "/oauth/request-token";
+  }
+
+  public String getAuthorizeUrlForToken(String token)
+  {
+    return getAuthorizeUrl() + "?oauth_token=" + token;
+  }
+
+  private String getAuthorizeUrl() {return baseUrl + SERVLET_BASE_URL + "/oauth/authorize";}
 }
