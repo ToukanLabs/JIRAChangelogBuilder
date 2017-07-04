@@ -9,29 +9,32 @@ import java.util.Date;
 import java.util.List;
 import junit.framework.TestCase;
 import java.util.LinkedList;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeNotNull;
 import java.util.Properties;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Test case for generating file and module changelog templates
  *
  * @author apigram
  */
-public class ChangelogTemplateTest extends TestCase {
+public class ChangelogTemplateTest {
 
   LinkedList<Change> issues;
   List<VersionInfo> versions;
   StringWriter output;
-
-  public ChangelogTemplateTest(String testName) {
-    super(testName);
+  
+  public ChangelogTemplateTest(){
+    super();
   }
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-    
+  
+  @Before
+  public void setUp() throws Exception {    
     File outputDir = new File("test_output");
     if (!outputDir.exists()) {
       try{
@@ -57,15 +60,15 @@ public class ChangelogTemplateTest extends TestCase {
     output = new StringWriter();
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     output.close();
-    super.tearDown();
   }
 
   /**
    * White-box unit test of createChangelog method, of class ChangelogTemplate.
    */
+  @Test
   public void testTextChangelog() throws Exception {
     System.out.println("textChangelog");
     try {
@@ -83,6 +86,7 @@ public class ChangelogTemplateTest extends TestCase {
   /**
    * White-box unit test of createChangelog method, of class ChangelogTemplate.
    */
+  @Test
   public void testHTMLChangelog() throws Exception {
     System.out.println("HTMLChangelog");
     try {
@@ -100,6 +104,7 @@ public class ChangelogTemplateTest extends TestCase {
   /**
    * White-box unit test of createChangelog method, of class ChangelogTemplate.
    */
+  @Test
   public void testXMLChangelog() throws Exception {
     System.out.println("XMLChangelog");
     try {
@@ -119,14 +124,17 @@ public class ChangelogTemplateTest extends TestCase {
    *
    * @throws Exception
    */
+  @Test
   public void testFullRun() throws Exception {
     Properties properties = new Properties();
     properties.load(new FileInputStream("testing.properties"));
+    assumeNotNull(properties.getProperty("oauthprivatekey"));
+    assumeNotNull(properties.getProperty("oauthaccesstoken"));
     System.out.println("fullRun");
     String[] args = new String[12];
     args[0] = properties.getProperty("url");
-    args[1] = properties.getProperty("username");
-    args[2] = properties.getProperty("password");
+    args[1] = properties.getProperty("oauthprivatekey");
+    args[2] = properties.getProperty("oauthaccesstoken");
     args[3] = properties.getProperty("project");
     args[4] = properties.getProperty("version");
     args[5] = "examples";
@@ -144,6 +152,7 @@ public class ChangelogTemplateTest extends TestCase {
     assertTrue(f.exists());
   }
 
+  @Test
   public void testLineEndings() throws Exception {
     System.out.println("lineEndings");
     FileWriter out1 = new FileWriter("test_output" + File.separator + "testNative.txt");
@@ -172,9 +181,12 @@ public class ChangelogTemplateTest extends TestCase {
    *
    * @throws Exception
    */
+  @Test
   public void testVersionStartsWith() throws Exception {
     Properties properties = new Properties();
     properties.load(new FileInputStream("testing.properties"));
+    assumeNotNull(properties.getProperty("oauthprivatekey"));
+    assumeNotNull(properties.getProperty("oauthaccesstoken"));
     System.out.println("startsWith");
     
     String starts_with = properties.getProperty("versionstartswith");
@@ -182,8 +194,8 @@ public class ChangelogTemplateTest extends TestCase {
     
     String[] args = new String[14];
     args[0] = properties.getProperty("url");
-    args[1] = properties.getProperty("username");
-    args[2] = properties.getProperty("password");
+    args[1] = properties.getProperty("oauthprivatekey");
+    args[2] = properties.getProperty("oauthaccesstoken");
     args[3] = properties.getProperty("project");
     args[4] = properties.getProperty("version");
     args[5] = "examples";
@@ -210,9 +222,12 @@ public class ChangelogTemplateTest extends TestCase {
    *
    * @throws Exception
    */
+  @Test
   public void testVersionLessThanOrEqual() throws Exception {
     Properties properties = new Properties();
     properties.load(new FileInputStream("testing.properties"));
+    assumeNotNull(properties.getProperty("oauthprivatekey"));
+    assumeNotNull(properties.getProperty("oauthaccesstoken"));
     System.out.println("lessThanOrEqual");
     
     String less_than_equal = properties.getProperty("versionlessthanorequal");
@@ -220,8 +235,8 @@ public class ChangelogTemplateTest extends TestCase {
     
     String[] args = new String[14];
     args[0] = properties.getProperty("url");
-    args[1] = properties.getProperty("username");
-    args[2] = properties.getProperty("password");
+    args[1] = properties.getProperty("oauthprivatekey");
+    args[2] = properties.getProperty("oauthaccesstoken");
     args[3] = properties.getProperty("project");
     args[4] = properties.getProperty("version");
     args[5] = "examples";

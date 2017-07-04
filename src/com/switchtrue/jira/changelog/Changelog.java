@@ -1,6 +1,8 @@
 package com.switchtrue.jira.changelog;
 
 import java.io.File;
+import com.atlassian.oauth.client.example.AtlassianOAuthClient;
+import com.atlassian.oauth.client.example.TokenSecretVerifierHolder;
 
 /**
  * Main class for creating a changelog from JIRA.
@@ -11,16 +13,18 @@ public class Changelog {
 
   public static String FIX_VERSION_RESTICT_MODE_STARTS_WITH        = "SW";
   public static String FIX_VERSION_RESTICT_MODE_LESS_THAN_OR_EQUAL = "LTE";
+  
+  public static final String CONSUMER_KEY = "JIRAChangelogBuilderFivium";
 
   /**
    * Show usage of the application.
    */
   public static void showUsage() {
     System.out.println("Usage:");
-    System.out.println("java -jar jira-changelog-builder.jar <JIRA_URL> <JIRA_username> <JIRA_password> <JIRA_project_key> <version> <template_list> [<flags>]");
+    System.out.println("java -jar jira-changelog-builder.jar <JIRA_URL> <OAuth_private_key> <OAuth_access_token> <JIRA_project_key> <version> <template_list> [<flags>]");
     System.out.println("<JIRA_URL>: The URL of the JIRA instance (e.g. https://somecompany.atlassian.net).");
-    System.out.println("<JIRA_username>: The username used to log into JIRA.");
-    System.out.println("<JIRA_password>: The password used to log into JIRA.");
+    System.out.println("<OAuth_private_key>: The RSA private key matching the public key entered into Application Link's Incoming Authentication on JIRA, used for OAuth.");
+    System.out.println("<OAuth_access_token>: The access token provided by JIRA after successful OAuth authorisation by JIRA administrator.");
     System.out.println("<JIRA_project_key>: The key of the project in JIRA.");
     System.out.println("<version>: Specifies up to which version the changelog should be generated.");
     System.out.println("<template_root>: The path on disk to the directory that contains the template files.");
@@ -43,8 +47,38 @@ public class Changelog {
    * @param args Arguments passed in from the command line
    */
   public static void main(String[] args) {
-    if (args.length == 1 && args[0].equals("--help")) {
-      showUsage();
+    int currentArgument = 0;
+    if (args.length == 1) {
+      if (args[0].equals("--help")) {
+        showUsage();
+        System.exit(0);
+      } else if (args[0].equals("--print-consumer-key")) {
+      System.out.println("Consumer key is: " + CONSUMER_KEY);
+      System.exit(0);
+      }
+    }
+    if (args.length == 3 && args[0].equals("-r")){
+      currentArgument++;
+      final String jiraUrl = args[currentArgument++];
+      final String oAuthPrivateKey = args[currentArgument++];
+      AtlassianOAuthClient jiraOAuthClient = new AtlassianOAuthClient(CONSUMER_KEY, oAuthPrivateKey, jiraUrl, "oob");
+      TokenSecretVerifierHolder requestToken = jiraOAuthClient.getRequestToken();
+      String authorizeUrl = jiraOAuthClient.getAuthorizeUrlForToken(requestToken.token);
+      System.out.println("REQUEST_TOKEN is " + requestToken.token);
+      System.out.println("TOKEN_SECRET is " + requestToken.secret);
+      System.out.println("Go to and 'Allow' to obtain VERIFIER:\n\n" + authorizeUrl);
+      System.exit(0);
+    }
+    if (args.length == 6 && args[0].equals("-a")) {
+      currentArgument++;
+      final String jiraUrl = args[currentArgument++];
+      final String oAuthPrivateKey = args[currentArgument++];
+      final String requestToken = args[currentArgument++];
+      final String tokenSecret = args[currentArgument++];
+      final String oAuthVerifer = args[currentArgument++];
+      AtlassianOAuthClient jiraOAuthClient = new AtlassianOAuthClient(CONSUMER_KEY, oAuthPrivateKey, jiraUrl, null);
+      String accessToken = jiraOAuthClient.swapRequestTokenForAccessToken(requestToken, tokenSecret, oAuthVerifer);
+      System.out.println("ACCESS_TOKEN is " + accessToken);
       System.exit(0);
     }
     if (args.length < 6) {
@@ -53,10 +87,9 @@ public class Changelog {
       System.exit(1);
     }
 
-    int currentArgument = 0;
     final String jiraURL = args[currentArgument++];
-    final String jiraUsername = args[currentArgument++];
-    final String jiraPassword = args[currentArgument++];
+    final String oAuthPrivateKey = args[currentArgument++]; //TODO: Read private key from file?
+    final String oAuthAccessToken = args[currentArgument++];
     final String jiraProjectKey = args[currentArgument++];
     final String versionName = args[currentArgument++];
     final String templateRoot = args[currentArgument++];
@@ -139,8 +172,8 @@ public class Changelog {
             + "\n  Version: " + versionName
             + "\n  JIRA Project Key: " + jiraProjectKey
             + "\n  JIRA URL: " + jiraURL
-            + "\n  JIRA username: " + jiraUsername
-            + "\n  JIRA password: " + jiraPassword.substring(0, 1) + "*****" + jiraPassword.substring(jiraPassword.length() - 1)
+            + "\n  OAuth private key: " + oAuthPrivateKey.substring(0, 1) + "***" + oAuthPrivateKey.substring(oAuthPrivateKey.length() - 1)
+            + "\n  OAuth access token: " + oAuthAccessToken.substring(0, 1) + "***" + oAuthAccessToken.substring(oAuthAccessToken.length() - 1)
             + "\n  Template files: " + templateList);
 
     File f;
@@ -151,8 +184,8 @@ public class Changelog {
         System.exit(2);
       }
     }
-
-    JiraAPI jiraApi = new JiraAPI(jiraUsername, jiraPassword, jiraURL, jql, descriptionField, fixVersionRestrictMode, fixVersionRestrictTerm);
+    
+    JiraAPI jiraApi = new JiraAPIOAuth(CONSUMER_KEY, oAuthPrivateKey, oAuthAccessToken, null, jiraURL, jql, descriptionField, fixVersionRestrictMode, fixVersionRestrictTerm);
 
     if (objectCachePath != null) {
       VersionInfoCache cache = new VersionInfoCache(jiraProjectKey, objectCachePath);

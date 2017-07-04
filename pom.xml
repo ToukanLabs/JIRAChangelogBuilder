@@ -36,7 +36,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -56,6 +56,30 @@
 			<groupId>com.sun.jersey.contribs</groupId>
 			<type>jar</type>
 			<version>1.18.1</version>
+		</dependency>
+		<dependency>
+			<artifactId>oauth</artifactId>
+			<groupId>net.oauth.core</groupId>
+			<type>jar</type>
+			<version>20100527</version>
+		</dependency>
+		<dependency>
+			<artifactId>oauth-consumer</artifactId>
+			<groupId>net.oauth.core</groupId>
+			<type>jar</type>
+			<version>20100527</version>
+		</dependency>
+		<dependency>
+			<artifactId>oauth-httpclient4</artifactId>
+			<groupId>net.oauth.core</groupId>
+			<type>jar</type>
+			<version>20090913</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<type>jar</type>
+			<version>4.3.4</version>
 		</dependency>
 	</dependencies>
 
