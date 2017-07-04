@@ -20,11 +20,11 @@ public class Changelog {
    * Show usage of the application.
    */
   public static void showUsage() {
-    System.out.println("\nUsage:");
+    System.out.println("Usage:");
     System.out.println("java -jar jira-changelog-builder.jar <JIRA_URL> <OAuth_private_key> <OAuth_access_token> <JIRA_project_key> <version> <template_list> [<flags>]");
     System.out.println("<JIRA_URL>: The URL of the JIRA instance (e.g. https://somecompany.atlassian.net).");
-    System.out.println("<OAuth_private_key>: RSA private key matching the public key entered into Application Link's Incoming Authentication on JIRA, used for OAuth.");
-    System.out.println("<OAuth_access_token>: Access token provided by JIRA after successful OAuth authorisation by JIRA administrator.");
+    System.out.println("<OAuth_private_key>: The RSA private key matching the public key entered into Application Link's Incoming Authentication on JIRA, used for OAuth.");
+    System.out.println("<OAuth_access_token>: The access token provided by JIRA after successful OAuth authorisation by JIRA administrator.");
     System.out.println("<JIRA_project_key>: The key of the project in JIRA.");
     System.out.println("<version>: Specifies up to which version the changelog should be generated.");
     System.out.println("<template_root>: The path on disk to the directory that contains the template files.");
